@@ -2,17 +2,23 @@ const express = require('express');
 const app = express();
 const http = require('http');
 const server = http.createServer(app);
-const { Server } = require("socket.io");
+const messagesRouter = require('./src/routes/messages.route');
+const morgan = require('morgan');
+const bodyParser = require('body-parser');
 const io = require('socket.io')(server, {
   cors: {
     origin: '*',
   }
 });
 
+//middleware
+app.use(morgan(':date[iso] :remote-addr :method :url :status - :response-time ms'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
-});
+//routes
+app.use('/messages', messagesRouter);
+
 
 io.on('connection', (socket) => {
 
